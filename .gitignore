@@ -1,0 +1,11 @@
+build/
+out/
+bin/
+
+*.out
+*.o
+*.exe
+cli-rpg
+
+.DS_Store
+Thumbs.db

@@ -1,7 +1,7 @@
 #pragma once
 #include <termios.h>
 
-namespace RPG::Engine {
+namespace Engine {
   class Input {
   private:
     struct termios og_termios;

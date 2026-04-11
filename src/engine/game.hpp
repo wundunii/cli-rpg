@@ -1,8 +1,10 @@
 #pragma once
 #include "input.hpp"
 #include "renderer.hpp"
+#include "../world/map.hpp"
+#include "../world/gen.hpp"
 
-namespace RPG::Engine {
+namespace Engine {
   class Game {
   private:
     bool isRunning;
@@ -10,7 +12,9 @@ namespace RPG::Engine {
     int playerY;
 
     Input input;
-    RPG::Renderer::Terminal renderer;
+    Renderer::Terminal renderer;
+    World::Map map;
+    World::Generator gen;
 
     void handleInput();
     void draw();

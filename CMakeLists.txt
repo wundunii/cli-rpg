@@ -11,6 +11,8 @@ set(SOURCES
   src/engine/renderer.cpp
   src/engine/input.cpp
   src/engine/game.cpp
+  src/world/map.cpp
+  src/world/gen.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

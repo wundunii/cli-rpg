@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 
-namespace RPG::Engine {
+namespace Engine {
 
   Input::Input() {
     enableRawMode();

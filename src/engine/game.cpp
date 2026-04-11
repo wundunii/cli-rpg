@@ -44,7 +44,7 @@ namespace Engine {
       }
     }
 
-    renderer.drawCell(playerX, playerY, "\xE2\x98\xA0", Renderer::Color::Red);
+    renderer.drawCell(playerX, playerY, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
     renderer.render();
   }
 

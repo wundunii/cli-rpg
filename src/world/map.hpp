@@ -15,6 +15,9 @@ namespace World {
     int height;
 
     std::vector<TileType> grid;
+
+    std::vector<bool> explored;
+
   public:
     Map(int w, int h);
 
@@ -32,6 +35,9 @@ namespace World {
     int getWidth() const {return width;}
     int getHeight() const {return height;}
 
-    void fill(TileType type = TileType::None);
+    void clear(TileType type = TileType::None);
+
+    bool isExplored(int x, int y) const;
+    void setExplored(int x, int y, bool state);
   };
 }

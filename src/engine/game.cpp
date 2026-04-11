@@ -1,24 +1,50 @@
 #include "game.hpp"
 
-namespace RPG::Engine {
-  Game::Game() : isRunning(true), playerX(40), playerY(12) {
-    // Init by member contructors
+namespace Engine {
+  Game::Game() : isRunning(true), map(80, 24) {
+    gen.genDungeon(map);
+
+    // Placeholder for spawning
+    playerX = 1;
+    playerY = 1;
   }
 
   void Game::handleInput() {
     char c = input.getKey();
+    int nextX = playerX;
+    int nextY = playerY;
+
     switch (c) {
-      case 'w': playerY--; break;
-      case 's': playerY++; break;
-      case 'a': playerX--; break;
-      case 'd': playerX++; break;
+      case 'w': nextY--; break;
+      case 's': nextY++; break;
+      case 'a': nextX--; break;
+      case 'd': nextX++; break;
       case 'q': isRunning = false; break;
+    }
+
+    //Only update postion if target tile is Floor
+    if (map.getTile(nextX, nextY) == World::TileType::Floor) {
+      playerX = nextX;
+      playerY = nextY;
     }
   }
 
   void Game::draw() {
     renderer.clear();
-    renderer.drawChar(playerX, playerY, '@');
+
+    for (int y = 0; y < map.getHeight(); y++) {
+      for (int x = 0; x < map.getWidth(); x++) {
+        World::TileType tile = map.getTile(x, y);
+
+        if (tile == World::TileType::Wall) {
+          renderer.drawCell(x, y, "\xE2\x96\x88", Renderer::Color::White);
+        } else if (tile == World::TileType::Floor) {
+          renderer.drawCell(x, y, " ");
+        }
+      }
+    }
+
+    renderer.drawCell(playerX, playerY, "\xE2\x98\xA0", Renderer::Color::Red);
     renderer.render();
   }
 

@@ -3,26 +3,39 @@
 #include <iostream>
 #include <vector>
 
-namespace RPG::Renderer {
+namespace Renderer {
 
   enum class Color {
     Reset = 0,
     Default = 39,
     Red = 31,
     Green = 32,
-    Yellow = 33, // "\033[5;33m" for blinking
+    Yellow = 33,
     Blue = 34,
     Magenta = 35,
     Cyan = 36,
-    White = 37
+    White = 37,
+    Black = 30,
+    Gray = 90
+  };
+
+  enum class Style {
+    None = 0,
+    Bold = 1,
+    Dim = 2,
+    Italic = 3,
+    Underline = 4,
+    Blink =5,
+    Reverse = 7
   };
 
   struct Cell {
-    char glyph = ' ';
+    const char* glyph = " ";
     Color color = Color::Default;
+    Style style = Style::None;
 
     bool operator!=(const Cell& other) const {
-      return glyph != other.glyph || color != other.color;
+      return glyph != other.glyph || color != other.color || style != other.style;
     }
   };
 
@@ -31,8 +44,7 @@ namespace RPG::Renderer {
     Terminal(int w = 80, int h = 24);
 
     void clear();
-    void drawChar(int x, int y, char c, Color color = Color::Default);
-    void drawString(int x, int y, std::string str, Color color = Color::Default);
+    void drawCell(int x, int y, const char* c, Color color = Color::Default, Style style = Style::None);
     void render();
 
   private:
@@ -42,7 +54,8 @@ namespace RPG::Renderer {
     std::vector<Cell> prevFrame;
     std::vector<Cell> currFrame;
 
-    std::string getColor(Color color);
+    const char* getColor(Color color);
+    const char* getStyle(Style style);
 
     inline int getIndex(int x, int y) const {
       return (y * width) + x;

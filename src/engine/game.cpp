@@ -7,6 +7,8 @@ namespace Engine {
     // Placeholder for spawning
     playerX = 1;
     playerY = 1;
+
+    revealFog();
   }
 
   void Game::handleInput() {
@@ -26,6 +28,16 @@ namespace Engine {
     if (map.getTile(nextX, nextY) == World::TileType::Floor) {
       playerX = nextX;
       playerY = nextY;
+      revealFog();
+    }
+  }
+
+  void Game::revealFog() {
+    //Reveal 3x3 around player
+    for (int dy = -1; dy <= 1; dy++) {
+      for (int dx = -1; dx <= 1; dx++) {
+        map.setExplored(playerX + dx, playerY + dy, true);
+      }
     }
   }
 
@@ -35,16 +47,18 @@ namespace Engine {
     for (int y = 0; y < map.getHeight(); y++) {
       for (int x = 0; x < map.getWidth(); x++) {
         World::TileType tile = map.getTile(x, y);
-
-        if (tile == World::TileType::Wall) {
-          renderer.drawCell(x, y, "\xE2\x96\x88", Renderer::Color::White);
-        } else if (tile == World::TileType::Floor) {
-          renderer.drawCell(x, y, " ");
+    
+        if (map.isExplored(x, y)) {
+          if (tile == World::TileType::Wall) {
+            renderer.drawCell(x, y, "\xE2\x96\x88", Renderer::Color::White);
+          } else if (tile == World::TileType::Floor) {
+            renderer.drawCell(x, y, " ");
+          }
         }
-      }
+     }
     }
 
-    renderer.drawCell(playerX, playerY, "\xE2\x98\xA0", Renderer::Color::Red);
+    renderer.drawCell(playerX, playerY, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
     renderer.render();
   }
 

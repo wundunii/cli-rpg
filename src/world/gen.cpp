@@ -22,7 +22,7 @@ namespace World {
   }
 
   void Generator::genDungeon(Map &map) {
-    map.fill(TileType::Wall);
+    map.clear(TileType::Wall);
 
     std::vector<Point> directions = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}};
 

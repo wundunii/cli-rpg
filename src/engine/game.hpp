@@ -19,6 +19,7 @@ namespace Engine {
     void handleInput();
     void draw();
 
+    void revealFog();
   public:
     Game();
     void run();

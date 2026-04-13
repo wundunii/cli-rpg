@@ -4,11 +4,11 @@ namespace Engine {
   Game::Game() : isRunning(true), map(62, 15) {
     gen.genDungeon(map);
 
-    // Placeholder for spawning
-    while (map.getTile(playerX, playerY) != World::TileType::Floor) {
+    //Spawn player on random Cell
+    do {
       playerX = gen.randomInt(1, 61);
       playerY = gen.randomInt(1, 14);
-    }
+    } while (map.getTile(playerX, playerY) != World::TileType::Floor);
     revealFog();
   }
 
@@ -55,7 +55,7 @@ namespace Engine {
     renderer.drawCell(1, 5, "--------------------------------------------------------------", Color::White);
     renderer.drawCell(0, 21, "+--------------------------------------------------------------+", Color::White);
   
-    //X offset 45: Minimap, Inventory, Skills
+    //Right Side
     renderer.drawCell(65, 0, "+-------------+", Color::White);
     renderer.drawCell(66, 5, "-------------", Color::White);
     renderer.drawCell(66, 11, "-------------", Color::White);
@@ -96,7 +96,7 @@ namespace Engine {
   void Game::drawMinimap() {
     using namespace Renderer;
     // Center of minimap (x: 66-78, y: 2-5)
-    int mapCenterX = 66 + 6;
+    int mapCenterX = 72;
     int mapCenterY = 3;
 
     for (int dy = -1; dy <= 1; dy++) {
@@ -123,7 +123,7 @@ namespace Engine {
     for (int y = 0; y < map.getHeight(); y++) {
       for (int x = 0; x < map.getWidth(); x++) {
         World::TileType tile = map.getTile(x, y);
-    
+ 
         if (map.isExplored(x, y)) {
           if (tile == World::TileType::Wall) {
             renderer.drawCell(x + 1, y + 6, "\xE2\x96\x88", Renderer::Color::White);

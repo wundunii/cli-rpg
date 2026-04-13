@@ -21,11 +21,11 @@ namespace World {
   public:
     Map(int w, int h);
 
-    inline int getIndex(int x, int y) const {
+    int getIndex(int x, int y) const {
       return (y * width) + x;
     }
 
-    inline bool inBounds(int x, int y) const {
+    bool inBounds(int x, int y) const {
       return x >= 0 && x < width && y >= 0 && y < height;
     }
 

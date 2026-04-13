@@ -5,9 +5,10 @@ namespace Engine {
     gen.genDungeon(map);
 
     // Placeholder for spawning
-    playerX = 1;
-    playerY = 1;
-
+    while (map.getTile(playerX, playerY) != World::TileType::Floor) {
+      playerX = gen.randomInt(1, 61);
+      playerY = gen.randomInt(1, 14);
+    }
     revealFog();
   }
 

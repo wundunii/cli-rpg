@@ -22,6 +22,8 @@ namespace Engine {
     void revealFog();
 
     void drawUIBorders();
+    void drawMinimap();
+    void drawFullmap();
   public:
     Game();
     void run();

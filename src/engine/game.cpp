@@ -6,7 +6,7 @@ namespace Engine {
 
     // Placeholder for spawning
     playerX = 1;
-    playerY = 6;
+    playerY = 1;
 
     revealFog();
   }
@@ -25,8 +25,7 @@ namespace Engine {
     }
 
     //Only update postion if target tile is Floor
-    if (map.getTile(nextX, nextY) == World::TileType::Floor &&
-        nextX > 0 && nextX < 64 && nextY > 5 && nextY < 21) {
+    if (map.getTile(nextX, nextY) == World::TileType::Floor) {
       playerX = nextX;
       playerY = nextY;
       revealFog();
@@ -42,7 +41,7 @@ namespace Engine {
     }
   }
 
-  void Game::drawUIBorders() {
+  void Game::drawUIBorders() { //TODO: Need to be more dynamic?
     using namespace Renderer;
     //Left Side: Combat Log and View Port 62x15
     renderer.drawCell(0, 0, "+--------------------------------------------------------------+", Color::White);
@@ -93,27 +92,56 @@ namespace Engine {
     renderer.drawCell(0, 23, "+--------------------------------------------------------------+ +-------------+", Color::White);
   }
 
-  void Game::draw() {
-    renderer.clear();
-    //Change this later to fit UI border
-    for (int y = 6; y < map.getHeight() + 6; y++) {
-      for (int x = 2; x < map.getWidth() + 2; x++) {
+  void Game::drawMinimap() {
+    using namespace Renderer;
+    // Center of minimap (x: 66-78, y: 2-5)
+    int mapCenterX = 66 + 6;
+    int mapCenterY = 3;
+
+    for (int dy = -1; dy <= 1; dy++) {
+      for (int dx = -5; dx <= 5; dx++) {
+        int worldX = playerX + dx;
+        int worldY = playerY + dy;
+
+        if (worldX == playerX && worldY == playerY) {
+          renderer.drawCell(mapCenterX + dx, mapCenterY + dy, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
+        } else if (map.isExplored(worldX, worldY)) {
+          World::TileType tile = map.getTile(worldX, worldY);
+          if (tile == World::TileType::Wall) {
+            renderer.drawCell(mapCenterX + dx, mapCenterY + dy, "\xE2\x96\x88", Renderer::Color::White);
+          } else if (tile == World::TileType::Floor) {
+            renderer.drawCell(mapCenterX + dx, mapCenterY + dy, " ");
+          }
+        }
+      }
+    }
+  }
+
+  void Game::drawFullmap() {
+    // Viewport (x: 1-62, y: 6-20)
+    for (int y = 0; y < map.getHeight(); y++) {
+      for (int x = 0; x < map.getWidth(); x++) {
         World::TileType tile = map.getTile(x, y);
     
         if (map.isExplored(x, y)) {
           if (tile == World::TileType::Wall) {
-            renderer.drawCell(x, y, "\xE2\x96\x88", Renderer::Color::White);
+            renderer.drawCell(x + 1, y + 6, "\xE2\x96\x88", Renderer::Color::White);
           } else if (tile == World::TileType::Floor) {
-            renderer.drawCell(x, y, " ");
+            renderer.drawCell(x + 1, y + 6, " ");
           }
         }
-     }
+      }
     }
 
-    renderer.drawCell(playerX, playerY, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
-    
+    renderer.drawCell(playerX + 1, playerY + 6, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
+  }
+
+  void Game::draw() {
+    renderer.clear();
 
     drawUIBorders();
+    drawMinimap();
+    drawFullmap();
     renderer.render();
   }
 

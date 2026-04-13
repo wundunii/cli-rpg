@@ -20,6 +20,8 @@ namespace Engine {
     void draw();
 
     void revealFog();
+
+    void drawUIBorders();
   public:
     Game();
     void run();

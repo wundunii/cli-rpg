@@ -9,11 +9,11 @@ namespace World {
   private:
     std::mt19937 rng;
 
-    int randomInt(int min, int max);
     bool canPlace(const Map& map, int x, int y);
   public:
     Generator();
 
+    int randomInt(int min, int max);
     void genDungeon(Map& map);
   };
 }

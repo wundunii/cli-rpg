@@ -4,9 +4,9 @@
 
 namespace World {
   enum class TileType : uint8_t {
-    None = 0,
-    Floor = 1,
-    Wall = 2
+    None,
+    Floor,
+    Wall
   };
 
   class Map {
@@ -21,11 +21,11 @@ namespace World {
   public:
     Map(int w, int h);
 
-    inline int getIndex(int x, int y) const {
+    int getIndex(int x, int y) const {
       return (y * width) + x;
     }
 
-    inline bool inBounds(int x, int y) const {
+    bool inBounds(int x, int y) const {
       return x >= 0 && x < width && y >= 0 && y < height;
     }
 

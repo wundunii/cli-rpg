@@ -1,34 +1,51 @@
 #include "game.hpp"
 
 namespace Engine {
-  Game::Game() : isRunning(true), map(62, 15) {
+  Game::Game() : isRunning{true}, currentState{GameState::Running}, map{62, 15} {
     gen.genDungeon(map);
 
-    // Placeholder for spawning
-    playerX = 1;
-    playerY = 1;
-
+    //Spawn player on random Cell
+    do {
+      playerX = gen.randomInt(1, 61);
+      playerY = gen.randomInt(1, 14);
+    } while (map.getTile(playerX, playerY) != World::TileType::Floor);
     revealFog();
   }
 
   void Game::handleInput() {
     char c = input.getKey();
+
     int nextX = playerX;
     int nextY = playerY;
 
-    switch (c) {
-      case 'w': nextY--; break;
-      case 's': nextY++; break;
-      case 'a': nextX--; break;
-      case 'd': nextX++; break;
-      case 'q': isRunning = false; break;
-    }
+    if (currentState == GameState::Running) {
 
-    //Only update postion if target tile is Floor
-    if (map.getTile(nextX, nextY) == World::TileType::Floor) {
-      playerX = nextX;
-      playerY = nextY;
-      revealFog();
+      switch (c) {
+        case 'w': nextY--; break;
+        case 's': nextY++; break;
+        case 'a': nextX--; break;
+        case 'd': nextX++; break;
+        case 'p': currentState = GameState::PauseMenu; break;
+        case 'm': currentState = GameState::ViewMap; break;
+      }
+
+      //Only update postion if target tile is Floor
+      if (map.getTile(nextX, nextY) == World::TileType::Floor) {
+        playerX = nextX;
+        playerY = nextY;
+        revealFog();
+      }
+    } else if (currentState == GameState::PauseMenu) {
+        switch (c) {
+          case 'p': currentState = GameState::Running; break;
+          case 'm': currentState = GameState::ViewMap; break;
+          case 'q': isRunning =false; break;
+      }
+    } else if (currentState == GameState::ViewMap) {
+      switch (c) {
+          case 'm': currentState = GameState::Running; break;
+          case 'p': currentState = GameState::PauseMenu; break;
+      }
     }
   }
 
@@ -54,7 +71,7 @@ namespace Engine {
     renderer.drawCell(1, 5, "--------------------------------------------------------------", Color::White);
     renderer.drawCell(0, 21, "+--------------------------------------------------------------+", Color::White);
   
-    //X offset 45: Minimap, Inventory, Skills
+    //Right Side
     renderer.drawCell(65, 0, "+-------------+", Color::White);
     renderer.drawCell(66, 5, "-------------", Color::White);
     renderer.drawCell(66, 11, "-------------", Color::White);
@@ -95,7 +112,7 @@ namespace Engine {
   void Game::drawMinimap() {
     using namespace Renderer;
     // Center of minimap (x: 66-78, y: 2-5)
-    int mapCenterX = 66 + 6;
+    int mapCenterX = 72;
     int mapCenterY = 3;
 
     for (int dy = -1; dy <= 1; dy++) {
@@ -122,7 +139,7 @@ namespace Engine {
     for (int y = 0; y < map.getHeight(); y++) {
       for (int x = 0; x < map.getWidth(); x++) {
         World::TileType tile = map.getTile(x, y);
-    
+ 
         if (map.isExplored(x, y)) {
           if (tile == World::TileType::Wall) {
             renderer.drawCell(x + 1, y + 6, "\xE2\x96\x88", Renderer::Color::White);
@@ -136,12 +153,34 @@ namespace Engine {
     renderer.drawCell(playerX + 1, playerY + 6, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
   }
 
+  void Game::clearViewport() {
+    for (int y = 6; y < 21; y++) {
+      for (int x = 1; x < 63; x++) {
+        renderer.drawCell(x, y, " ", Renderer::Color::Default, Renderer::Style::None);
+      }
+    }
+  }
+
   void Game::draw() {
     renderer.clear();
 
     drawUIBorders();
     drawMinimap();
-    drawFullmap();
+
+    renderer.render();
+    if (currentState == GameState::Running) {
+      //Show ViewPort
+      clearViewport();
+    } else if (currentState == GameState::ViewMap) {
+      clearViewport();
+      drawFullmap();
+    } else if (currentState == GameState::PauseMenu) {
+      renderer.drawCell(29, 6, "PAUSED", Renderer::Color::Red, Renderer::Style::Blink);
+      renderer.drawCell(2, 8, "P: Resume", Renderer::Color::Cyan, Renderer::Style::Underline);
+      renderer.drawCell(2, 10, "Q: Quit", Renderer::Color::Cyan, Renderer::Style::Underline);
+      renderer.drawCell(2, 12, "M: View Full Map", Renderer::Color::Cyan, Renderer::Style::Underline);
+    }
+
     renderer.render();
   }
 

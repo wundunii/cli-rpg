@@ -10,7 +10,7 @@ namespace Renderer {
   }
 
   void Terminal::clear() {
-    std::fill(currFrame.begin(), currFrame.end(), Cell{" ", Color::Default});
+    std::fill(currFrame.begin(), currFrame.end(), Cell{" ", Color::Default, Style::None});
   }
 
   void Terminal::drawCell(int x, int y, const char* c, Color color, Style style) {
@@ -21,44 +21,51 @@ namespace Renderer {
 
   const char* Terminal::getColor(Color color) {
     switch (color) {
-      default: return "\033[39m";
-      case Color::Red: return "\033[31m";
-      case Color::Green: return "\033[32m";
-      case Color::Yellow: return "\033[33m";
-      case Color::Blue: return "\033[34m";
-      case Color::Magenta: return "\033[35m";
-      case Color::Cyan: return "\033[36m";
-      case Color::White: return "\033[37m";
-      case Color::Black: return "\033[30m";
-      case Color::Gray: return "\033[90m";
+      default: return "39m";
+      case Color::Red: return "31m";
+      case Color::Green: return "32m";
+      case Color::Yellow: return "33m";
+      case Color::Blue: return "34m";
+      case Color::Magenta: return "35m";
+      case Color::Cyan: return "36m";
+      case Color::White: return "37m";
+      case Color::Black: return "30m";
+      case Color::Gray: return "90m";
     }
   }
 
   const char* Terminal::getStyle(Style style) {
     switch(style) {
-      default: return "";
-      case Style::Bold: return "\033[1m";
-      case Style::Dim: return "\033[2m";
-      case Style::Italic: return "\033[3m";
-      case Style::Underline: return "\033[4m";
-      case Style::Blink: return "\033[5m";
-      case Style::Reverse: return "\033[7m";
+      default: return "0;";
+      case Style::None: return "0;";
+      case Style::Bold: return "1;";
+      case Style::Dim: return "2;";
+      case Style::Italic: return "3;";
+      case Style::Underline: return "4;";
+      case Style::Blink: return "5;";
+      case Style::Reverse: return "7;";
     }
   }
+
   void Terminal::render() {
     std::string outBuffer;
 
+    //Max 15 chars per ANSI sequence
     outBuffer.reserve(width * height * 15);
 
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         int i = getIndex(x, y);
 
+        //Syntax: \033[<STYLE>;<FG_COLOR>;<BG_COLOR>m
         if (currFrame[i] != prevFrame[i]) {
           outBuffer += "\033[" + std::to_string(y + 1) + ";" + std::to_string(x + 1) +  "H"; //Move the cursor
-         
-          //Hard Reset to prevent bold/blink bleeding 
+
+          //Reset style and color
           outBuffer += "\033[0m";
+
+          //Start of ANSI escape sequence
+          outBuffer += "\033[";
 
           if (currFrame[i].style != Style::None) {
             outBuffer += getStyle(currFrame[i].style); //Set Style
@@ -72,7 +79,7 @@ namespace Renderer {
       }
     }
 
-    outBuffer += "\033[0m"; //Reset colors
+    outBuffer += "\033[0m"; //Reset at the end of buffer to prevent bleeding
     std::cout << outBuffer << std::flush; //print the whole buffer
   }
 }

@@ -4,9 +4,9 @@
 
 namespace World {
   enum class TileType : uint8_t {
-    None = 0,
-    Floor = 1,
-    Wall = 2
+    None,
+    Floor,
+    Wall
   };
 
   class Map {

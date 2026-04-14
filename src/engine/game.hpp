@@ -5,9 +5,17 @@
 #include "../world/gen.hpp"
 
 namespace Engine {
+
+  enum class GameState : uint8_t {
+    PauseMenu,
+    ViewMap,
+    Running
+  };
+
   class Game {
   private:
     bool isRunning;
+    GameState currentState;
     int playerX;
     int playerY;
 
@@ -24,6 +32,8 @@ namespace Engine {
     void drawUIBorders();
     void drawMinimap();
     void drawFullmap();
+    void clearViewport();
+
   public:
     Game();
     void run();

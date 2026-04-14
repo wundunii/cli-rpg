@@ -46,10 +46,11 @@ namespace Renderer {
       case Style::Reverse: return "7;";
     }
   }
+
   void Terminal::render() {
     std::string outBuffer;
 
-    //Reserve some memory for the buffer, might change later?
+    //Max 15 chars per ANSI sequence
     outBuffer.reserve(width * height * 15);
 
     for (int y = 0; y < height; y++) {
@@ -63,7 +64,7 @@ namespace Renderer {
           //Reset style and color
           outBuffer += "\033[0m";
 
-          //Start of ASCII escape sequence
+          //Start of ANSI escape sequence
           outBuffer += "\033[";
 
           if (currFrame[i].style != Style::None) {
@@ -78,7 +79,7 @@ namespace Renderer {
       }
     }
 
-    //outBuffer += "\033[0m"; //not sure if needed.
+    outBuffer += "\033[0m"; //Reset at the end of buffer to prevent bleeding
     std::cout << outBuffer << std::flush; //print the whole buffer
   }
 }

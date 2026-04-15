@@ -1,13 +1,13 @@
 #include "game.hpp"
 
 namespace Engine {
-  Game::Game() : isRunning{true}, currState{GameState::Running}, prevState(GameState::Running), map{63, 15} {
+  Game::Game() : isRunning{true}, currState{GameState::Running}, prevState(GameState::Running), map{63, 14} {
     gen.genDungeon(map);
 
     //Spawn player on random Cell
     do {
       playerX = gen.randomInt(1, 62);
-      playerY = gen.randomInt(1, 14);
+      playerY = gen.randomInt(1, 13);
     } while (map.getTile(playerX, playerY) != World::TileType::Floor);
     revealFog();
 
@@ -77,12 +77,24 @@ namespace Engine {
     int sightX = pdx[playerD];
     int sightY = pdy[playerD];
 
-    World::TileType tile = map.getTile(playerX + sightX, playerY + sightY);
 
-    if (tile == World::TileType::Wall) {
-      renderer.drawCell(x + sightX, y + sightY, "▓");
-    } else if (tile == World::TileType::Floor) {
-      renderer.drawCell(x + sightX, y + sightY, " ");
+    for (int dy = -1; dy <= 1; dy++) {
+      for (int dx = -1; dx <= 1; dx++) {
+        //Avoid drawing on top of the player
+        if (sightX + dx == 0 && sightY + dy == 0) {
+          continue;
+        }
+
+        World::TileType tile = map.getTile(playerX + sightX + dx, playerY + sightY + dy);
+
+        if (map.isExplored(playerX + sightX + dx, playerY + sightY + dy)) {
+          if (tile == World::TileType::Wall) {
+            renderer.drawCell(x + sightX + dx, y + sightY + dy, "▓");
+          } else if (tile == World::TileType::Floor) {
+            renderer.drawCell(x + sightX + dx, y + sightY + dy, " ");
+          }
+        }
+      }
     }
   }
 
@@ -105,20 +117,20 @@ namespace Engine {
       renderer.drawCell(65, i, "║", Color::White);
       renderer.drawCell(79, i, "║", Color::White);
     }
-    renderer.drawCell(1, 5, "═══════════════════════════════════════════════════════════════", Color::White);
+    renderer.drawCell(1, 6, "═══════════════════════════════════════════════════════════════", Color::White);
     renderer.drawCell(0, 21, "╠═══════════════════════════════════════════════════════════════╣", Color::White);
   
     //Right Side
     renderer.drawCell(65, 0, "╔═════════════╗", Color::White);
-    renderer.drawCell(66, 5, "═════════════", Color::White);
+    renderer.drawCell(66, 6, "═════════════", Color::White);
     renderer.drawCell(66, 11, "═════════════", Color::White);
     renderer.drawCell(66, 16, "═════════════", Color::White);
     renderer.drawCell(65, 21, "╠═════════════╣", Color::White);
   
     //Titles
     renderer.drawCell(27, 1, "COMBAT LOG", Color::Cyan, Style::Bold);
-    renderer.drawCell(71, 1, "MAP", Color::Cyan, Style::Bold);
-    renderer.drawCell(68, 6, "INVENTORY", Color::Cyan, Style::Bold);
+    //renderer.drawCell(71, 1, "MAP", Color::Cyan, Style::Bold);
+    //renderer.drawCell(68, 6, "INVENTORY", Color::Cyan, Style::Bold);
     renderer.drawCell(69, 12, "SKILLS", Color::Cyan, Style::Bold);
     renderer.drawCell(70, 17, "STATS", Color::Cyan, Style::Bold);
   
@@ -152,7 +164,7 @@ namespace Engine {
     int mapCenterX = 72;
     int mapCenterY = 3;
 
-    for (int dy = -1; dy <= 1; dy++) {
+    for (int dy = -2; dy <= 2; dy++) {
       for (int dx = -5; dx <= 5; dx++) {
         int worldX = playerX + dx;
         int worldY = playerY + dy;
@@ -174,9 +186,9 @@ namespace Engine {
   }
 
   void Game::drawFullmap() {
-    // Viewport (x: 1-63, y: 6-20)
+    // Viewport (x: 1-63, y: 7-20)
     int mapX = 1;
-    int mapY = 6;
+    int mapY = 7;
 
     for (int y = 0; y < map.getHeight(); y++) {
       for (int x = 0; x < map.getWidth(); x++) {
@@ -197,16 +209,16 @@ namespace Engine {
   }
 
   void Game::drawPauseMenu() {
-    renderer.drawCell(29, 6, "PAUSED", Renderer::Color::Red, Renderer::Style::Bold);
-    renderer.drawCell(2, 8, "P: Resume", Renderer::Color::Cyan, Renderer::Style::Underline);
-    renderer.drawCell(2, 10, "Q: Quit", Renderer::Color::Cyan, Renderer::Style::Underline);
-    renderer.drawCell(2, 12, "M: View Full Map", Renderer::Color::Cyan, Renderer::Style::Underline);
+    renderer.drawCell(29, 7, "PAUSED", Renderer::Color::Red, Renderer::Style::Bold);
+    renderer.drawCell(2, 9, "P: Resume", Renderer::Color::Cyan, Renderer::Style::Underline);
+    renderer.drawCell(2, 11, "Q: Quit", Renderer::Color::Cyan, Renderer::Style::Underline);
+    renderer.drawCell(2, 13, "M: View Full Map", Renderer::Color::Cyan, Renderer::Style::Underline);
   }
 
   //Cannot use " " because Cells can have strings with length > 1
   //Hacky but works well for now
   void Game::clearViewport() {
-    for (int y = 6; y < 21; y++) {
+    for (int y = 7; y < 21; y++) {
       renderer.drawCell(1, y, "                                                              ");
     }
   }

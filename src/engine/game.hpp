@@ -15,7 +15,8 @@ namespace Engine {
   class Game {
   private:
     bool isRunning;
-    GameState currentState;
+    GameState currState;
+    GameState prevState;
     int playerX;
     int playerY;
 
@@ -32,6 +33,7 @@ namespace Engine {
     void drawUIBorders();
     void drawMinimap();
     void drawFullmap();
+    void drawPauseMenu();
     void clearViewport();
 
   public:

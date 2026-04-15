@@ -34,8 +34,15 @@ namespace Renderer {
     Color color = Color::Default;
     Style style = Style::None;
 
+    //Only needed for cells' tails cleaning
+    //int length = std::string_view(glyph).length();
+
+    bool operator==(const Cell& other) const {
+      return std::string_view(glyph) == std::string_view(other.glyph) && color == other.color && style == other.style;
+    }
+
     bool operator!=(const Cell& other) const {
-      return glyph != other.glyph || color != other.color || style != other.style;
+      return !(*this == other);
     }
   };
 
@@ -47,7 +54,6 @@ namespace Renderer {
     void clear();
     void drawCell(int x, int y, const char* c, Color color = Color::Default, Style style = Style::None);
     void render();
-
   private:
     int width;
     int height;

@@ -74,6 +74,14 @@ namespace Renderer {
           outBuffer += getColor(currFrame[i].color); //Set the color
           outBuffer += currFrame[i].glyph; //Add character
 
+          //Clean cells' tails by comparing the string length, does not work well with Unicode symbols
+          /*
+          if (currFrame[i].length < prevFrame[i].length) {
+            int diff = prevFrame[i].length - currFrame[i].length;
+            outBuffer.append(diff, ' ');
+          }
+          */
+
           prevFrame[i] = currFrame[i];
         }
       }

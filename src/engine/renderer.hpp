@@ -49,7 +49,10 @@ namespace Renderer {
   class Terminal {
   public:
     //Using the size of classic terminals for now
-    Terminal(int w = 80, int h = 24);
+    Terminal(int w, int h);
+
+    int getWidth() const {return width;}
+    int getHeight() const {return height;}
 
     void clear();
     void drawCell(int x, int y, const char* c, Color color = Color::Default, Style style = Style::None);

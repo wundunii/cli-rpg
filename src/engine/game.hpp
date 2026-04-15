@@ -29,10 +29,21 @@ namespace Engine {
     //PLayer's Direction
     int playerD;
 
+    //Change in playerX and playerY based on direction
+    int pdx[4] = {0, 1, 0, -1};
+    int pdy[4] = {-1, 0, 1, 0};
+
     Input input;
+
     Renderer::Terminal renderer;
+
+    //Resolution
+    int screenW = renderer.getWidth();
+    int screenH = renderer.getHeight();
+
     World::Map map;
     World::Generator gen;
+
 
     void handleInput();
     void draw();
@@ -46,7 +57,7 @@ namespace Engine {
     void drawMinimap();
     void drawFullmap();
     void drawPauseMenu();
-    
+
     void clearViewport();
 
   public:

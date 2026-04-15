@@ -11,6 +11,7 @@ set(SOURCES
   src/engine/renderer.cpp
   src/engine/input.cpp
   src/engine/game.cpp
+  src/engine/game_draw.cpp
   src/world/map.cpp
   src/world/gen.cpp
 )

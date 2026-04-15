@@ -12,6 +12,13 @@ namespace Engine {
     Running
   };
 
+  enum PlayerD {
+    North = 0,
+    East = 1,
+    South = 2,
+    West = 3
+  };
+
   class Game {
   private:
     bool isRunning;
@@ -19,6 +26,8 @@ namespace Engine {
     GameState prevState;
     int playerX;
     int playerY;
+    //PLayer's Direction
+    int playerD;
 
     Input input;
     Renderer::Terminal renderer;
@@ -30,10 +39,14 @@ namespace Engine {
 
     void revealFog();
 
+    void drawPlayer(int x, int y);
+    void drawPlayerSight(int x, int y);
+
     void drawUIBorders();
     void drawMinimap();
     void drawFullmap();
     void drawPauseMenu();
+    
     void clearViewport();
 
   public:

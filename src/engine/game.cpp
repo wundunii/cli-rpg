@@ -10,7 +10,14 @@ namespace Engine {
       playerY = gen.randomInt(1, 14);
     } while (map.getTile(playerX, playerY) != World::TileType::Floor);
     revealFog();
+
+    //TODO: player should face TileType::Floor at spawn.
+    playerD = PlayerD::North;
   }
+
+  //Change in playerX and playerY based on direction
+  int pdx[] = {0, 1, 0, -1};
+  int pdy[] = {-1, 0, 1, 0};
 
   void Game::handleInput() {
     char c = input.getKey();
@@ -21,10 +28,18 @@ namespace Engine {
     if (currState == GameState::Running) {
 
       switch (c) {
-        case 'w': nextY--; break;
-        case 's': nextY++; break;
-        case 'a': nextX--; break;
-        case 'd': nextX++; break;
+        case 'w': {
+                    nextX += pdx[playerD];
+                    nextY += pdy[playerD];
+                    break;
+                  }
+        case 's': {
+                    nextX -= pdx[playerD];
+                    nextY -= pdy[playerD];
+                    break;
+                  }
+        case 'a': playerD = (playerD - 1 + 4) % 4; break;
+        case 'd': playerD = (playerD + 1) % 4; break;
         case 'p': currState = GameState::PauseMenu; break;
         case 'm': currState = GameState::ViewMap; break;
       }
@@ -39,13 +54,35 @@ namespace Engine {
         switch (c) {
           case 'p': currState = GameState::Running; break;
           case 'm': currState = GameState::ViewMap; break;
-          case 'q': isRunning =false; break;
+          case 'q': isRunning = false; break;
       }
     } else if (currState == GameState::ViewMap) {
       switch (c) {
           case 'm': currState = GameState::Running; break;
           case 'p': currState = GameState::PauseMenu; break;
       }
+    }
+  }
+
+  void Game::drawPlayer(int x, int y) {
+    switch (playerD) {
+      case 0: renderer.drawCell(x, y, "^", Renderer::Color::Red, Renderer::Style::Bold); break;
+      case 1: renderer.drawCell(x, y, ">", Renderer::Color::Red, Renderer::Style::Bold); break;
+      case 2: renderer.drawCell(x, y, "v", Renderer::Color::Red, Renderer::Style::Bold); break;
+      case 3: renderer.drawCell(x, y, "<", Renderer::Color::Red, Renderer::Style::Bold); break;
+    }
+  }
+
+  void Game::drawPlayerSight(int x, int y) {
+    int sightX = pdx[playerD];
+    int sightY = pdy[playerD];
+
+    World::TileType tile = map.getTile(playerX + sightX, playerY + sightY);
+
+    if (tile == World::TileType::Wall) {
+      renderer.drawCell(x + sightX, y + sightY, "▓");
+    } else if (tile == World::TileType::Floor) {
+      renderer.drawCell(x + sightX, y + sightY, " ");
     }
   }
 
@@ -121,7 +158,7 @@ namespace Engine {
         int worldY = playerY + dy;
 
         if (worldX == playerX && worldY == playerY) {
-          renderer.drawCell(mapCenterX + dx, mapCenterY + dy, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
+          drawPlayer(mapCenterX, mapCenterY);
         } else if (map.isExplored(worldX, worldY)) {
           World::TileType tile = map.getTile(worldX, worldY);
           if (tile == World::TileType::Wall) {
@@ -132,6 +169,8 @@ namespace Engine {
         }
       }
     }
+
+    drawPlayerSight(mapCenterX, mapCenterY);
   }
 
   void Game::drawFullmap() {
@@ -153,7 +192,8 @@ namespace Engine {
       }
     }
 
-    renderer.drawCell(playerX + mapX, playerY + mapY, "\xE2\x98\xA0", Renderer::Color::Red, Renderer::Style::Blink);
+    drawPlayer(playerX + mapX, playerY + mapY);
+    drawPlayerSight(playerX + mapX, playerY + mapY);
   }
 
   void Game::drawPauseMenu() {

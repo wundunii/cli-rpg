@@ -106,28 +106,35 @@ namespace Engine {
     renderer.drawCell(screenW - 1, screenH - 1, "╝");
 
     //Texts
-    renderer.drawCell(screenW * 2 / 5 - 5, 1, "COMBAT LOG", Color::Cyan, Style::Bold);
-    renderer.drawCell(screenW * 9 / 10 - 3, 1, "MAP (M)", Color::Cyan, Style::Bold);
-    renderer.drawCell(screenW * 9 / 10 - 4, screenH / 4 + 1, "INVENTORY", Color::Cyan, Style::Bold);
-    renderer.drawCell(screenW * 9 / 10 - 4, screenH / 2, "ABILITIES", Color::Cyan, Style::Bold);
-    renderer.drawCell(screenW * 9 / 10 - 2, screenH * 3 / 4 - 1, "STATS", Color::Cyan, Style::Bold);
+    drawText(screenW * 2 / 5 - 5, 1, "COMBAT LOG", Color::Cyan, Style::Bold);
+    drawText(screenW * 9 / 10 - 3, 1, "MAP (M)", Color::Cyan, Style::Bold);
+    drawText(screenW * 9 / 10 - 4, screenH / 4 + 1, "INVENTORY", Color::Cyan, Style::Bold);
+    drawText(screenW * 9 / 10 - 4, screenH / 2, "ABILITIES", Color::Cyan, Style::Bold);
+    drawText(screenW * 9 / 10 - 2, screenH * 3 / 4 - 1, "STATS", Color::Cyan, Style::Bold);
 
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH / 4 + 2, "Gold:", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH / 4 + 3, "Heal:", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH / 4 + 2, "Gold:", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH / 4 + 3, "Heal:", Color::Magenta);
+    //Unicode symbols have to be drawn with drawCell
     renderer.drawCell(screenW * 4 / 5 + 3, screenH / 4 + 4, "\xE2\x9A\x94", Color::Magenta);
     renderer.drawCell(screenW * 4 / 5 + 3, screenH / 4 + 5, "\xE2\x9B\x8A", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH / 2 + 1, "1.", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH / 2 + 2, "2.", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH / 2 + 3, "3.", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH * 3 / 4, "STR:", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH * 3 / 4 + 1, "CON:", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH * 3 / 4 + 2, "INT:", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH / 2 + 1, "1.", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH / 2 + 2, "2.", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH / 2 + 3, "3.", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH * 3 / 4, "STR:", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH * 3 / 4 + 1, "CON:", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH * 3 / 4 + 2, "INT:", Color::Magenta);
 
-    renderer.drawCell(2, screenH - 2, "Level:", Color::Magenta);
-    renderer.drawCell(screenW / 5, screenH - 2, "HP:", Color::Magenta);
-    renderer.drawCell(screenW * 2 / 5, screenH - 2, "MP:", Color::Magenta);
-    renderer.drawCell(screenW * 3 / 5, screenH - 2, "XP:", Color::Magenta);
-    renderer.drawCell(screenW * 4 / 5 + 3, screenH - 2, "(P): Pause", Color::Magenta);
+    drawText(2, screenH - 2, "Level:", Color::Magenta);
+    drawText(screenW / 5, screenH - 2, "HP:", Color::Magenta);
+    drawText(screenW * 2 / 5, screenH - 2, "MP:", Color::Magenta);
+    drawText(screenW * 3 / 5, screenH - 2, "XP:", Color::Magenta);
+    drawText(screenW * 4 / 5 + 3, screenH - 2, "(P): Pause", Color::Magenta);
+  }
+
+  void Game::drawText(int x, int y, std::string str, Renderer::Color color, Renderer::Style style) {
+    for (size_t i = 0; i < str.length(); i++) {
+      renderer.drawCell(x + i, y, std::string(1, str[i]), color, style);
+    }
   }
 
   void Game::drawMinimap() {
@@ -137,8 +144,8 @@ namespace Engine {
     int mapCenterX = screenW * 9 / 10;
     int mapCenterY = screenH / 8 + 1;
 
-    for (int dy = -3; dy <= 3; dy++) {
-      for (int dx = -9; dx <= 9; dx++) {
+    for (int dy = 1 - screenH / 8; dy <= screenH / 8 - 1; dy++) {
+      for (int dx = 2 - screenW / 10; dx <= screenW / 10 - 2; dx++) {
         int worldX = playerX + dx;
         int worldY = playerY + dy;
 
@@ -167,7 +174,7 @@ namespace Engine {
       for (int x = 0; x < map.getWidth(); x++) {
         World::TileType tile = map.getTile(x, y);
  
-        if (!map.isExplored(x, y)) {
+        if (map.isExplored(x, y)) {
           if (tile == World::TileType::Wall) {
             renderer.drawCell(x + mapX, y + mapY, "▓", Renderer::Color::White);
           } else if (tile == World::TileType::Floor) {
@@ -183,25 +190,17 @@ namespace Engine {
 
   void Game::drawPauseMenu() {
 
-    renderer.drawCell(screenW * 2 / 5 - 3, screenH / 4 + 1, "PAUSED", Renderer::Color::Red, Renderer::Style::Bold);
-    renderer.drawCell(2, screenH / 4 + 2, "P: Resume", Renderer::Color::Cyan, Renderer::Style::Underline);
-    renderer.drawCell(2, screenH / 4 + 3, "Q: Quit", Renderer::Color::Cyan, Renderer::Style::Underline);
-    renderer.drawCell(2, screenH / 4 + 4, "M: View Full Map", Renderer::Color::Cyan, Renderer::Style::Underline);
+    drawText(screenW * 2 / 5 - 3, screenH / 4 + 1, "PAUSED", Renderer::Color::Red, Renderer::Style::Bold);
+    drawText(2, screenH / 4 + 2, "P: Resume", Renderer::Color::Cyan, Renderer::Style::Underline);
+    drawText(2, screenH / 4 + 3, "Q: Quit", Renderer::Color::Cyan, Renderer::Style::Underline);
+    drawText(2, screenH / 4 + 4, "M: View Full Map", Renderer::Color::Cyan, Renderer::Style::Underline);
   }
 
-  //Hacky, only works for a fixed terminal size
   void Game::clearViewport() {
-
-    /*Cannot use " " because Cells can have strings with length > 1
     for (int y = screenH / 4 + 1; y < screenH - 3; y++) {
       for (int x = 1; x < screenW * 4 / 5; x++) {
         renderer.drawCell(x, y, " ");
       }
-    }
-    */
-
-    for (int y = screenH / 4 + 1; y < screenH - 3; y++) {
-        renderer.drawCell(1, y, "                                                                                               ");
     }
   }
 
@@ -212,15 +211,14 @@ namespace Engine {
     drawMinimap();
 
     //Force rendering after switching state to prevent bleeding
-    if (currState != prevState) {
-      renderer.render();
-      clearViewport();
-      prevState = currState;
-    }
+    //if (currState != prevState) {
+      //renderer.render();
+      //clearViewport();
+      //prevState = currState;
+    //}
 
     if (currState == GameState::Running) {
       //Show ViewPort
-      renderer.drawCell(10, 10, "ViewPort here");
     } else if (currState == GameState::ViewMap) {
       drawFullmap();
     } else if (currState == GameState::PauseMenu) {

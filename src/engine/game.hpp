@@ -23,7 +23,6 @@ namespace Engine {
   private:
     bool isRunning;
     GameState currState;
-    GameState prevState;
     int playerX;
     int playerY;
     //PLayer's Direction
@@ -53,6 +52,7 @@ namespace Engine {
     void drawPlayer(int x, int y);
     void drawPlayerSight(int x, int y);
 
+    void drawText(int x, int y, std::string, Renderer::Color color = Renderer::Color::Default, Renderer::Style style = Renderer::Style::None);
     void drawUIBorders();
     void drawMinimap();
     void drawFullmap();

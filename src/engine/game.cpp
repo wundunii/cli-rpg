@@ -1,7 +1,8 @@
 #include "game.hpp"
 
+//Screen Size: x % 5 = 0 && y % 4 = 0 && y >= 28
 namespace Engine {
-  Game::Game() : isRunning{true}, currState{GameState::Running}, prevState(GameState::Running), renderer{120, 36}, map{screenW * 4 / 5 - 1, screenH * 3 / 4 - 4} {
+  Game::Game() : isRunning{true}, currState{GameState::Running}, renderer{120, 36}, map{screenW * 4 / 5 - 1, screenH * 3 / 4 - 4} {
     gen.genDungeon(map);
 
     //Spawn player on random Cell

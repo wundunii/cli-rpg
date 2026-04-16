@@ -30,7 +30,7 @@ namespace Renderer {
   };
 
   struct Cell {
-    const char* glyph = " ";
+    std::string glyph = " ";
     Color color = Color::Default;
     Style style = Style::None;
 
@@ -55,7 +55,7 @@ namespace Renderer {
     int getHeight() const {return height;}
 
     void clear();
-    void drawCell(int x, int y, const char* c, Color color = Color::Default, Style style = Style::None);
+    void drawCell(int x, int y, std::string c, Color color = Color::Default, Style style = Style::None);
     void render();
   private:
     int width;

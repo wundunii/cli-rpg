@@ -32,6 +32,10 @@ namespace Engine {
     int pdx[4] = {0, 1, 0, -1};
     int pdy[4] = {-1, 0, 1, 0};
 
+    //Right vector based on direction
+    int psx[4] = {1, 0, -1, 0};
+    int psy[4] = {0, 1, 0, -1};
+
     Input input;
 
     Renderer::Terminal renderer;

@@ -389,22 +389,24 @@ constexpr std::string_view RightNext[] = {"   /|",
     int cx = screenW * 2 / 5 ;
     int cy = screenH / 2;
 
+    //Front should be drawn last
     const int order[] = {-1, 1, 0};
 
-    for (int d = 3; d >= 0; d--) {
-      for (int s : order) {
+    for (int d = 3; d >= 0; d--) { //Distance
+      for (int s : order) { //Side
         if (d == 0 && s == 0) continue;
 
-        int worldX = playerX;
-        int worldY = playerY;
-
+        //world_coord = player_coord + forward_vector*direction + right_vector*side
+        int worldX = playerX + pdx[playerD] * d + psx[playerD] * s;
+        int worldY = playerY + pdy[playerD] * d + psy[playerD] * s;
+        /*
         switch (playerD) {
           case North: worldX += s; worldY -= d; break;
           case East: worldX += d; worldY += s; break;
           case South: worldX -= s; worldY += d; break;
           case West: worldX -= d; worldY -= s; break;
         }
-        
+        */
         World::TileType tile = map.getTile(worldX, worldY);
         if (tile != World::TileType::Wall) continue;
 

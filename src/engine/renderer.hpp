@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <string_view>
 #include <iostream>
 #include <vector>
 #include <cstdint>
@@ -30,15 +30,12 @@ namespace Renderer {
   };
 
   struct Cell {
-    std::string glyph = " ";
+    std::string_view glyph = " ";
     Color color = Color::Default;
     Style style = Style::None;
 
-    //Only needed for cells' tails cleaning
-    //int length = std::string_view(glyph).length();
-
     bool operator==(const Cell& other) const {
-      return std::string_view(glyph) == std::string_view(other.glyph) && color == other.color && style == other.style;
+      return glyph == other.glyph && color == other.color && style == other.style;
     }
 
     bool operator!=(const Cell& other) const {
@@ -55,7 +52,7 @@ namespace Renderer {
     int getHeight() const {return height;}
 
     void clear();
-    void drawCell(int x, int y, std::string c, Color color = Color::Default, Style style = Style::None);
+    void drawCell(int x, int y, std::string_view c, Color color = Color::Default, Style style = Style::None);
     void render();
   private:
     int width;

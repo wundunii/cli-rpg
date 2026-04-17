@@ -13,7 +13,7 @@ namespace Renderer {
     std::fill(currFrame.begin(), currFrame.end(), Cell{" ", Color::Default, Style::None});
   }
 
-  void Terminal::drawCell(int x, int y, std::string c, Color color, Style style) {
+  void Terminal::drawCell(int x, int y, std::string_view c, Color color, Style style) {
     if (inBounds(x, y)) {
       currFrame[getIndex(x, y)] = Cell{c, color, style};
     }
@@ -73,14 +73,6 @@ namespace Renderer {
 
           outBuffer += getColor(currFrame[i].color); //Set the color
           outBuffer += currFrame[i].glyph; //Add character
-
-          //Clean cells' tails by comparing the string length, does not work well with Unicode symbols
-          /*
-          if (currFrame[i].length < prevFrame[i].length) {
-            int diff = prevFrame[i].length - currFrame[i].length;
-            outBuffer.append(diff, ' ');
-          }
-          */
 
           prevFrame[i] = currFrame[i];
         }

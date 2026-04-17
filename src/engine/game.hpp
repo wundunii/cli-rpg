@@ -52,11 +52,21 @@ namespace Engine {
     void drawPlayer(int x, int y);
     void drawPlayerSight(int x, int y);
 
-    void drawText(int x, int y, std::string, Renderer::Color color = Renderer::Color::Default, Renderer::Style style = Renderer::Style::None);
+    void drawText(int x, int y, std::string_view str, Renderer::Color color = Renderer::Color::Default, Renderer::Style style = Renderer::Style::None);
     void drawUIBorders();
     void drawMinimap();
     void drawFullmap();
     void drawPauseMenu();
+    void drawPOV();
+
+    template <size_t N>
+    void drawBlock(int screenX, int screenY, const std::string_view (&block)[N]) {
+      for (size_t y = 0; y < N; y++) {
+        std::string_view line = block[y];
+
+        drawText(screenX, screenY + (int)y, line);
+      }
+    }
 
     void clearViewport();
 

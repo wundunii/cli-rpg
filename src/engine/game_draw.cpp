@@ -1,12 +1,14 @@
 #include "game.hpp"
 
+using namespace Renderer;
+
 namespace Engine {
   void Game::drawPlayer(int x, int y) {
     switch (playerD) {
-      case 0: renderer.drawCell(x, y, "^", Renderer::Color::Red, Renderer::Style::Bold); break;
-      case 1: renderer.drawCell(x, y, ">", Renderer::Color::Red, Renderer::Style::Bold); break;
-      case 2: renderer.drawCell(x, y, "v", Renderer::Color::Red, Renderer::Style::Bold); break;
-      case 3: renderer.drawCell(x, y, "<", Renderer::Color::Red, Renderer::Style::Bold); break;
+      case 0: renderer.drawCell(x, y, "^", Color::Red, Style::Bold); break;
+      case 1: renderer.drawCell(x, y, ">", Color::Red, Style::Bold); break;
+      case 2: renderer.drawCell(x, y, "v", Color::Red, Style::Bold); break;
+      case 3: renderer.drawCell(x, y, "<", Color::Red, Style::Bold); break;
     }
   }
 
@@ -32,6 +34,12 @@ namespace Engine {
           }
         }
       }
+    }
+  }
+
+  void Game::drawText(int x, int y, std::string_view str, Color color, Style style) {
+    for (size_t i = 0; i < str.length(); i++) {
+      renderer.drawCell(x + i, y, str.substr(i, 1), color, style);
     }
   }
 
@@ -107,7 +115,7 @@ namespace Engine {
 
     //Texts
     drawText(screenW * 2 / 5 - 5, 1, "COMBAT LOG", Color::Cyan, Style::Bold);
-    drawText(screenW * 9 / 10 - 3, 1, "MAP (M)", Color::Cyan, Style::Bold);
+    //drawText(screenW * 9 / 10 - 3, 1, "MAP (M)", Color::Cyan, Style::Bold);
     drawText(screenW * 9 / 10 - 4, screenH / 4 + 1, "INVENTORY", Color::Cyan, Style::Bold);
     drawText(screenW * 9 / 10 - 4, screenH / 2, "ABILITIES", Color::Cyan, Style::Bold);
     drawText(screenW * 9 / 10 - 2, screenH * 3 / 4 - 1, "STATS", Color::Cyan, Style::Bold);
@@ -131,21 +139,15 @@ namespace Engine {
     drawText(screenW * 4 / 5 + 3, screenH - 2, "(P): Pause", Color::Magenta);
   }
 
-  void Game::drawText(int x, int y, std::string str, Renderer::Color color, Renderer::Style style) {
-    for (size_t i = 0; i < str.length(); i++) {
-      renderer.drawCell(x + i, y, std::string(1, str[i]), color, style);
-    }
-  }
-
   void Game::drawMinimap() {
     using namespace Renderer;
 
     // Center of minimap
     int mapCenterX = screenW * 9 / 10;
-    int mapCenterY = screenH / 8 + 1;
+    int mapCenterY = screenH / 8;
 
     for (int dy = 1 - screenH / 8; dy <= screenH / 8 - 1; dy++) {
-      for (int dx = 2 - screenW / 10; dx <= screenW / 10 - 2; dx++) {
+      for (int dx = 3 - screenW / 10; dx <= screenW / 10 - 3; dx++) {
         int worldX = playerX + dx;
         int worldY = playerY + dy;
 
@@ -154,7 +156,7 @@ namespace Engine {
         } else if (map.isExplored(worldX, worldY)) {
           World::TileType tile = map.getTile(worldX, worldY);
           if (tile == World::TileType::Wall) {
-            renderer.drawCell(mapCenterX + dx, mapCenterY + dy, "▓", Renderer::Color::White);
+            renderer.drawCell(mapCenterX + dx, mapCenterY + dy, "▓", Color::White);
           } else if (tile == World::TileType::Floor) {
             renderer.drawCell(mapCenterX + dx, mapCenterY + dy, "░");
           }
@@ -176,7 +178,7 @@ namespace Engine {
  
         if (map.isExplored(x, y)) {
           if (tile == World::TileType::Wall) {
-            renderer.drawCell(x + mapX, y + mapY, "▓", Renderer::Color::White);
+            renderer.drawCell(x + mapX, y + mapY, "▓", Color::White);
           } else if (tile == World::TileType::Floor) {
             renderer.drawCell(x + mapX, y + mapY, "░");
           }
@@ -189,17 +191,238 @@ namespace Engine {
   }
 
   void Game::drawPauseMenu() {
-
-    drawText(screenW * 2 / 5 - 3, screenH / 4 + 1, "PAUSED", Renderer::Color::Red, Renderer::Style::Bold);
-    drawText(2, screenH / 4 + 2, "P: Resume", Renderer::Color::Cyan, Renderer::Style::Underline);
-    drawText(2, screenH / 4 + 3, "Q: Quit", Renderer::Color::Cyan, Renderer::Style::Underline);
-    drawText(2, screenH / 4 + 4, "M: View Full Map", Renderer::Color::Cyan, Renderer::Style::Underline);
+    drawText(screenW * 2 / 5 - 3, screenH / 4 + 1, "PAUSED", Color::Red, Style::Bold);
+    drawText(2, screenH / 4 + 2, "P: Resume", Color::Cyan, Style::Underline);
+    drawText(2, screenH / 4 + 3, "Q: Quit", Color::Cyan, Style::Underline);
+    drawText(2, screenH / 4 + 4, "M: View Full Map", Color::Cyan, Style::Underline);
   }
 
+  /*
   void Game::clearViewport() {
     for (int y = screenH / 4 + 1; y < screenH - 3; y++) {
       for (int x = 1; x < screenW * 4 / 5; x++) {
         renderer.drawCell(x, y, " ");
+      }
+    }
+  }
+  */
+
+constexpr std::string_view FrontFar[] = {"|###########################################################################|",
+                                         "|###########################################################################|",
+                                         "|###########################################################################|",
+                                         "|###########################################################################|",
+                                         "|###########################################################################|",
+                                         "|###########################################################################|",
+                                         "|###########################################################################|",
+                                         "|###########################################################################|"};
+
+constexpr std::string_view FrontMid[] = {"|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|",
+                                         "|###############################################################################|"};
+
+constexpr std::string_view FrontNear[] = {"|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|",
+                                         "|#####################################################################################|"};
+
+constexpr std::string_view LeftFar[] = {"####|\\",
+                                        "####||",
+                                        "####||",
+                                        "####||",
+                                        "####||",
+                                        "####||",
+                                        "####||",
+                                        "####|/"};
+
+constexpr std::string_view LeftMid[] = {"####|\\",
+                                        "####||\\",
+                                        "####|||",
+                                        "####|||",
+                                        "####|||",
+                                        "####|||",
+                                        "####|||",
+                                        "####|||",
+                                        "####|||",
+                                        "####|||",
+                                        "####||/",
+                                        "####|/"};
+
+constexpr std::string_view LeftNear[] = {"####|\\",
+                                        "####||\\",
+                                        "####|||\\",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####||||",
+                                        "####|||/",
+                                        "####||/",
+                                        "####|/"};
+
+constexpr std::string_view LeftNext[] = {"|\\",
+                                        "||\\",
+                                        "|||\\",
+                                        "||||\\",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "||||/",
+                                        "|||/",
+                                        "||/",
+                                        "|/"};
+
+constexpr std::string_view RightFar[] = {"/|####",
+                                        "||####",
+                                        "||####",
+                                        "||####",
+                                        "||####",
+                                        "||####",
+                                        "||####",
+                                        "\\|####"};
+
+constexpr std::string_view RightMid[] = {" /|####",
+                                        "/||####",
+                                        "|||####",
+                                        "|||####",
+                                        "|||####",
+                                        "|||####",
+                                        "|||####",
+                                        "|||####",
+                                        "|||####",
+                                        "|||####",
+                                        "\\||####",
+                                        " \\|####"};
+
+constexpr std::string_view RightNear[] = {"  /|####",
+                                        " /||####",
+                                        "/|||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "||||####",
+                                        "\\|||####",
+                                        " \\||####",
+                                        "  \\|####"};
+
+constexpr std::string_view RightNext[] = {"   /|",
+                                        "  /||",
+                                        " /|||",
+                                        "/||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "|||||",
+                                        "\\||||",
+                                        " \\|||",
+                                        "  \\||",
+                                        "   \\|"};
+
+
+  void Game::drawPOV() {
+    int cx = screenW * 2 / 5 ;
+    int cy = screenH / 2;
+
+    const int order[] = {-1, 1, 0};
+
+    for (int d = 3; d >= 0; d--) {
+      for (int s : order) {
+        if (d == 0 && s == 0) continue;
+
+        int worldX = playerX;
+        int worldY = playerY;
+
+        switch (playerD) {
+          case North: worldX += s; worldY -= d; break;
+          case East: worldX += d; worldY += s; break;
+          case South: worldX -= s; worldY += d; break;
+          case West: worldX -= d; worldY -= s; break;
+        }
+        
+        World::TileType tile = map.getTile(worldX, worldY);
+        if (tile != World::TileType::Wall) continue;
+
+        if (s == -1) { //Left
+          if (d == 3) drawBlock(cx + s * 42, cy, LeftFar);
+          if (d == 2) drawBlock(cx + s * 44, cy - 2, LeftMid);
+          if (d == 1) drawBlock(cx + s * 47, cy - 5, LeftNear);
+          if (d == 0) drawBlock(cx + s * 47, cy - 9, LeftNext);
+        } else if (s == 1) { //Right
+          if (d == 3) drawBlock(cx + s * 37, cy, RightFar);
+          if (d == 2) drawBlock(cx + s * 38, cy - 2, RightMid);
+          if (d == 1) drawBlock(cx + s * 40, cy - 5, RightNear);
+          if (d == 0) drawBlock(cx + s * 43, cy - 9, RightNext);
+        } else if (s == 0) { //Front
+          if (d == 3) drawBlock(cx - 38, cy, FrontFar);
+          if (d == 2) drawBlock(cx - 40, cy - 2, FrontMid);
+          if (d == 1) drawBlock(cx - 43, cy - 5, FrontNear);
+        }
       }
     }
   }
@@ -210,15 +433,8 @@ namespace Engine {
     drawUIBorders();
     drawMinimap();
 
-    //Force rendering after switching state to prevent bleeding
-    //if (currState != prevState) {
-      //renderer.render();
-      //clearViewport();
-      //prevState = currState;
-    //}
-
     if (currState == GameState::Running) {
-      //Show ViewPort
+      drawPOV();
     } else if (currState == GameState::ViewMap) {
       drawFullmap();
     } else if (currState == GameState::PauseMenu) {

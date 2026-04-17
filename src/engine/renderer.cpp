@@ -13,7 +13,7 @@ namespace Renderer {
     std::fill(currFrame.begin(), currFrame.end(), Cell{" ", Color::Default, Style::None});
   }
 
-  void Terminal::drawCell(int x, int y, const char* c, Color color, Style style) {
+  void Terminal::drawCell(int x, int y, std::string_view c, Color color, Style style) {
     if (inBounds(x, y)) {
       currFrame[getIndex(x, y)] = Cell{c, color, style};
     }

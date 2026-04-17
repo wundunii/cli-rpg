@@ -35,6 +35,9 @@ namespace World {
     int getWidth() const {return width;}
     int getHeight() const {return height;}
 
+    void setWidth(int w) {width = w;}
+    void setHeight(int h) {height = h;}
+
     void clear(TileType type = TileType::None);
 
     bool isExplored(int x, int y) const;

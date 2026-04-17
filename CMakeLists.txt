@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(cli-rpg VERSION 0.4.0 LANGUAGES CXX)
+project(cli-rpg VERSION 0.5.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,6 +11,7 @@ set(SOURCES
   src/engine/renderer.cpp
   src/engine/input.cpp
   src/engine/game.cpp
+  src/engine/game_draw.cpp
   src/world/map.cpp
   src/world/gen.cpp
 )
